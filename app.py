@@ -16,6 +16,16 @@ def home():
 def chat():
     user_msg = request.json.get("message")
 
+    user_msg = request.json.get("message")
+
+# Calculator mode check
+if re.fullmatch(r"[0-9\+\-\*\/\s\(\)]+", user_msg):
+    try:
+        result = eval(user_msg)
+        return jsonify({"reply": f"🧮 Answer: {result}"})
+    except:
+        return jsonify({"reply": "Invalid math expression 😢"})
+
     if not user_msg:
         return jsonify({"reply": "No message received 😢"})
 
