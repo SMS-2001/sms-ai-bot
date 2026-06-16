@@ -35,13 +35,11 @@ function sendMsg(){
     })
     .then(res => res.json())
     .then(data => {
-    document.getElementById("chat-box").innerHTML +=
-    "<div class='bot'>Bot: " + data.reply + "</div>";
+        document.getElementById("chat-box").innerHTML +=
+        "<div class='bot'>Bot: " + data.reply + "</div>";
+    });
 
-    // 🔊 AI SPEAK (ADD THIS)
-    let speech = new SpeechSynthesisUtterance(data.reply);
-    speech.lang = "en-IN";
-    window.speechSynthesis.speak(speech);
+    document.getElementById("msg").value = "";
 });
 }
 </script>
