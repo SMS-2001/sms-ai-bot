@@ -1,10 +1,10 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 import os
+import re
 
 app = Flask(__name__)
 
-# API Key from Render Environment Variables
 API_KEY = os.getenv("API_KEY")
 
 @app.route("/")
@@ -15,16 +15,7 @@ def home():
 @app.route("/chat", methods=["POST"])
 def chat():
     user_msg = request.json.get("message")
-
-    user_msg = request.json.get("message")
-
-# Calculator mode check
-if re.fullmatch(r"[0-9\+\-\*\/\s\(\)]+", user_msg):
-    try:
-        result = eval(user_msg)
-        return jsonify({"reply": f"🧮 Answer: {result}"})
-    except:
-        return jsonify({"reply": "Invalid math expression 😢"})
+    msg_lower = user_msg.lower()
 
     if not user_msg:
         return jsonify({"reply": "No message received 😢"})
@@ -32,20 +23,51 @@ if re.fullmatch(r"[0-9\+\-\*\/\s\(\)]+", user_msg):
     if not API_KEY:
         return jsonify({"reply": "API Key missing 😢"})
 
-    # Gemini 2.5 Flash model endpoint
+    # 🧮 MATH MODE
+    if re.fullmatch(r"[0-9\+\-\*\/\s\(\)]+", user_msg):
+        try:
+            result = eval(user_msg)
+            return jsonify({"reply": f"🧮 Answer: {result}"})
+        except:
+            return jsonify({"reply": "Invalid math expression 😢"})
+
+
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={API_KEY}"
 
-    payload = {
-        "contents": [{
-            "parts": [{"text": user_msg}]
-        }]
-    }
+    # 🧠 BIOLOGY MODE
+    if any(word in msg_lower for word in ["biology", "cell", "dna", "plant", "human", "body", "heart", "blood"]):
+        payload = {
+            "contents": [{
+                "parts": [{
+                    "text": "You are a biology teacher. Explain in simple Hindi + English:\n" + user_msg
+                }]
+            }]
+        }
+
+    # 📜 HISTORY MODE
+    elif any(word in msg_lower for word in ["history", "war", "independence", "freedom", "king", "mughal", "british"]):
+        payload = {
+            "contents": [{
+                "parts": [{
+                    "text": "You are a history teacher. Explain in simple Hindi + English:\n" + user_msg
+                }]
+            }]
+        }
+
+    # 🤖 GENERAL MODE
+    else:
+        payload = {
+            "contents": [{
+                "parts": [{
+                    "text": "Answer in simple and clear way for students:\n" + user_msg
+                }]
+            }]
+        }
 
     try:
         response = requests.post(url, json=payload, timeout=10)
         data = response.json()
 
-        # safe response handling
         reply = (
             data.get("candidates", [{}])[0]
             .get("content", {})
@@ -54,14 +76,13 @@ if re.fullmatch(r"[0-9\+\-\*\/\s\(\)]+", user_msg):
         )
 
         if not reply:
-            reply = "AI response empty 😢 (API issue)"
+            reply = "AI response empty 😢"
 
-    except Exception:
+    except:
         reply = "AI not responding 😢"
 
     return jsonify({"reply": reply})
 
 
-# local testing only (Render ignores this)
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
