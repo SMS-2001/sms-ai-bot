@@ -21,6 +21,7 @@
 </div>
 
 <script>
+<script>
 function sendMsg(){
 
     let msg = document.getElementById("msg").value;
@@ -40,21 +41,43 @@ function sendMsg(){
     .then(res => res.json())
     .then(data => {
 
+        // 🧠 show bot reply
         document.getElementById("chat-box").innerHTML +=
         "<div class='bot'>Bot: " + data.reply + "</div>";
 
-        // 🔊 VOICE OUTPUT (FIXED HERE)
-        let speech = new SpeechSynthesisUtterance(data.reply);
-        speech.lang = "hi-IN";
-        speech.rate = 1;
-        speech.pitch = 1;
-        window.speechSynthesis.speak(speech);
+        // 🔊 FIXED VOICE (NOW INSIDE DATA BLOCK)
+        if(data.reply){
+            let speech = new SpeechSynthesisUtterance(data.reply);
+            speech.lang = "hi-IN";
+            speech.rate = 1;
+            speech.pitch = 1;
+            window.speechSynthesis.speak(speech);
+        }
 
         // auto scroll
         let chatBox = document.getElementById("chat-box");
         chatBox.scrollTop = chatBox.scrollHeight;
+    })
+    .catch(err => {
+        document.getElementById("chat-box").innerHTML +=
+        "<div class='bot'>Bot: Error 😢</div>";
     });
 }
+
+// 🎤 VOICE INPUT
+function startVoice(){
+    let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "hi-IN";
+
+    recognition.onresult = function(event){
+        let text = event.results[0][0].transcript;
+        document.getElementById("msg").value = text;
+        sendMsg();
+    }
+
+    recognition.start();
+}
+</script>
 </script>
 
 </body>
