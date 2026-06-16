@@ -34,6 +34,7 @@ def choose_model(user_msg: str):
 
 
 # 🚀 CALL GEMINI API
+
 def call_gemini(model, prompt):
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={API_KEY}"
 
@@ -44,6 +45,10 @@ def call_gemini(model, prompt):
     }
 
     response = requests.post(url, json=payload, timeout=15)
+
+    print("MODEL:", model)
+    print("RESPONSE:", response.text)   # 🔥 IMPORTANT DEBUG
+
     return response.json()
 
 
