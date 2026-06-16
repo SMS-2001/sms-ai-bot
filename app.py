@@ -4,6 +4,7 @@ import os
 
 app = Flask(__name__)
 
+# API Key from Render / Environment Variables
 API_KEY = os.getenv("API_KEY")
 
 @app.route("/")
@@ -12,10 +13,13 @@ def home():
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_msg = request.json["message"]
+    user_msg = request.json.get("message")
+
+    if not user_msg:
+        return jsonify({"reply": "No message received 😢"})
 
     if not API_KEY:
-        return jsonify({"reply": "API Key missing!"})
+        return jsonify({"reply": "API Key missing 😢"})
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}"
 
@@ -26,19 +30,26 @@ def chat():
     }
 
     try:
-    response = requests.post(url, json=payload, timeout=10)
-    data = response.json()
+        response = requests.post(url, json=payload, timeout=10)
+        data = response.json()
 
-    reply = (
-        data.get("candidates", [{}])[0]
-        .get("content", {})
-        .get("parts", [{}])[0]
-        .get("text", "AI response error 😢")
-    )
-except:
-    reply = "AI not responding 😢"
-    
+        # safe response handling
+        reply = (
+            data.get("candidates", [{}])[0]
+            .get("content", {})
+            .get("parts", [{}])[0]
+            .get("text", None)
+        )
+
+        if not reply:
+            reply = "AI response empty 😢"
+
+    except Exception as e:
+        reply = "AI not responding 😢"
+
     return jsonify({"reply": reply})
 
+
+# Render uses gunicorn, so this is optional (local testing only)
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
