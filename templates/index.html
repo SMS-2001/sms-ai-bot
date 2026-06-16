@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,7 +8,7 @@
 <body>
 
 <div class="chat-container">
-    <h2>SMS AI Bot</h2>
+    <h2>🤖 SMS AI Bot</h2>
 
     <div id="chat-box"></div>
 
@@ -24,7 +23,6 @@
 function sendMsg(){
 
     let msg = document.getElementById("msg").value;
-
     if(msg === "") return;
 
     document.getElementById("chat-box").innerHTML +=
@@ -43,25 +41,18 @@ function sendMsg(){
         document.getElementById("chat-box").innerHTML +=
         "<div class='bot'>Bot: " + data.reply + "</div>";
 
-        // 🔊 voice output
-        if(data.reply){
-            let speech = new SpeechSynthesisUtterance(data.reply);
-            speech.lang = "hi-IN";
-            speech.rate = 1;
-            speech.pitch = 1;
-            window.speechSynthesis.speak(speech);
-        }
+        // 🔊 Voice
+        let speech = new SpeechSynthesisUtterance(data.reply);
+        speech.lang = "hi-IN";
+        speech.rate = 1;
+        window.speechSynthesis.speak(speech);
 
-        let chatBox = document.getElementById("chat-box");
-        chatBox.scrollTop = chatBox.scrollHeight;
-    })
-    .catch(() => {
-        document.getElementById("chat-box").innerHTML +=
-        "<div class='bot'>Bot: Error 😢</div>";
+        let box = document.getElementById("chat-box");
+        box.scrollTop = box.scrollHeight;
     });
 }
 
-// 🎤 voice input
+// 🎤 Voice input
 function startVoice(){
     let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = "hi-IN";
