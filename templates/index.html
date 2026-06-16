@@ -23,18 +23,14 @@
 <script>
 function sendMsg(){
 
-    let speech = new SpeechSynthesisUtterance(data.reply);
-speech.lang = "hi-IN";   // Hindi voice
-speech.rate = 1;
-speech.pitch = 1;
-window.speechSynthesis.speak(speech);
-    
     let msg = document.getElementById("msg").value;
 
     if(msg === "") return;
 
     document.getElementById("chat-box").innerHTML +=
     "<div class='user'>You: " + msg + "</div>";
+
+    document.getElementById("msg").value = "";
 
     fetch("/chat", {
         method: "POST",
@@ -43,28 +39,22 @@ window.speechSynthesis.speak(speech);
     })
     .then(res => res.json())
     .then(data => {
+
         document.getElementById("chat-box").innerHTML +=
         "<div class='bot'>Bot: " + data.reply + "</div>";
+
+        // 🔊 VOICE OUTPUT (FIXED HERE)
+        let speech = new SpeechSynthesisUtterance(data.reply);
+        speech.lang = "hi-IN";
+        speech.rate = 1;
+        speech.pitch = 1;
+        window.speechSynthesis.speak(speech);
+
+        // auto scroll
+        let chatBox = document.getElementById("chat-box");
+        chatBox.scrollTop = chatBox.scrollHeight;
     });
-
-    document.getElementById("msg").value = "";
 }
-    function startVoice(){
-    let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = "hi-IN";   // Hindi input
-
-    recognition.onstart = function(){
-        console.log("Voice started...");
-    }
-
-    recognition.onresult = function(event){
-        let text = event.results[0][0].transcript;
-        document.getElementById("msg").value = text;
-        sendMsg(); // auto send
-    }
-
-    recognition.start();
-    }
 </script>
 
 </body>
