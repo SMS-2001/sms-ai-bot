@@ -15,11 +15,20 @@
     <div class="input-box">
         <input type="text" id="msg" placeholder="Ask anything...">
         <button onclick="sendMsg()">Send</button>
+
+        <button onclick="startVoice()">🎤 Speak</button>
     </div>
 </div>
 
 <script>
 function sendMsg(){
+
+    let speech = new SpeechSynthesisUtterance(data.reply);
+speech.lang = "hi-IN";   // Hindi voice
+speech.rate = 1;
+speech.pitch = 1;
+window.speechSynthesis.speak(speech);
+    
     let msg = document.getElementById("msg").value;
 
     if(msg === "") return;
@@ -40,6 +49,22 @@ function sendMsg(){
 
     document.getElementById("msg").value = "";
 }
+    function startVoice(){
+    let recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "hi-IN";   // Hindi input
+
+    recognition.onstart = function(){
+        console.log("Voice started...");
+    }
+
+    recognition.onresult = function(event){
+        let text = event.results[0][0].transcript;
+        document.getElementById("msg").value = text;
+        sendMsg(); // auto send
+    }
+
+    recognition.start();
+    }
 </script>
 
 </body>
