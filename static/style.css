@@ -10,6 +10,12 @@ body {
     margin: auto;
     padding: 10px;
 }
+.chat-container h2 {
+    background: white;
+    color:blue;
+    width:100%;
+    height: 30px;
+}
 
 #chat-box {
     height: 80vh;
