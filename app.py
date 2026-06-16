@@ -4,12 +4,13 @@ import os
 
 app = Flask(__name__)
 
-# API Key from Render / Environment Variables
+# API Key from Render Environment Variables
 API_KEY = os.getenv("API_KEY")
 
 @app.route("/")
 def home():
     return render_template("index.html")
+
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -20,7 +21,9 @@ def chat():
 
     if not API_KEY:
         return jsonify({"reply": "API Key missing 😢"})
-      url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={API_KEY}"
+
+    # Gemini 2.5 Flash model endpoint
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={API_KEY}"
 
     payload = {
         "contents": [{
@@ -37,18 +40,18 @@ def chat():
             data.get("candidates", [{}])[0]
             .get("content", {})
             .get("parts", [{}])[0]
-            .get("text", None)
+            .get("text")
         )
 
         if not reply:
-            reply = "AI response empty 😢"
+            reply = "AI response empty 😢 (API issue)"
 
-    except Exception as e:
+    except Exception:
         reply = "AI not responding 😢"
 
     return jsonify({"reply": reply})
 
 
-# Render uses gunicorn, so this is optional (local testing only)
+# local testing only (Render ignores this)
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
