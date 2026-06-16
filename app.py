@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+9from flask import Flask, render_template, request, jsonify
 import requests
 import os
 
@@ -20,7 +20,7 @@ def chat():
 
     if not API_KEY:
         return jsonify({"reply": "API Key missing 😢"})
-      url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
+      url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={API_KEY}"
 
     payload = {
         "contents": [{
