@@ -26,13 +26,18 @@ def chat():
     }
 
     try:
-        response = requests.post(url, json=payload)
-        data = response.json()
+    response = requests.post(url, json=payload, timeout=10)
+    data = response.json()
 
-        reply = data["candidates"][0]["content"]["parts"][0]["text"]
-    except:
-        reply = "Sorry 😢 AI not responding right now."
-
+    reply = (
+        data.get("candidates", [{}])[0]
+        .get("content", {})
+        .get("parts", [{}])[0]
+        .get("text", "AI response error 😢")
+    )
+except:
+    reply = "AI not responding 😢"
+    
     return jsonify({"reply": reply})
 
 if __name__ == "__main__":
